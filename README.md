@@ -1,6 +1,9 @@
 # Projet-Vocal-Weather
 Projet réalisé dans le cadre de la formation Développeur en Intelligence Artificielle.
 
+# Version python
+Obligation absolue de travailler sous python 3.12
+
 ## Installation
 
 1.  Création de l'environnement virtuel
@@ -40,4 +43,5 @@ DB_NAME="database_name"
 
 SPEECH_KEY = "YourKey"
 SPEECH_REGION = "YourRegion"
+YOUR_API_KEY = "YourAPIWeatherKey"
 ```
