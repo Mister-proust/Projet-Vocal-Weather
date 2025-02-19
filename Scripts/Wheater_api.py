@@ -6,7 +6,7 @@ from pprint import pprint
 from dotenv import load_dotenv
 import os
 import requests
-from ner_transformers import extract_loc, extract_date
+from ner_transformers import extract_loc, extract_date, current_date
 import dateparser
 
 
@@ -15,6 +15,8 @@ WHEATER_KEY = os.getenv("YOUR_API_KEY")
 
 LOC=extract_loc()
 print(LOC)
+
+
 DATE=str(extract_date())
 print(DATE)
 DATE_EXACT = dateparser.parse(DATE, settings={"DATE_ORDER": "YMD"})
@@ -30,7 +32,7 @@ q = 'Tours' # str | Pass US Zipcode, UK Postcode, Canada Postalcode, IP address,
 dt = '2025-02-18' # date | Date on or after 1st Jan, 2015 in yyyy-MM-dd format
 
 
-url = f"http://api.weatherapi.com/v1/forecast.json?key={WHEATER_KEY}&q={LOC}&days={DATE_EXACT}&aqi=no&alerts=no"
+url = f"http://api.weatherapi.com/v1/forecast.json?key={WHEATER_KEY}&q={LOC}&days={current_date}&aqi=no&alerts=no"
 response = requests.get(url)
 
 if response.status_code == 200:

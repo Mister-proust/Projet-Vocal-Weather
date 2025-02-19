@@ -9,3 +9,4 @@ tiktoken
 protobuf
 sentencepiece
 dateparser
+google-genai

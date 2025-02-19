@@ -1,0 +1,11 @@
+README.md
+setup.py
+Scripts/Wheater_api.py
+Scripts/__init__.py
+Scripts/ner_transformers.py
+Scripts/speech_recognition.py
+Scripts.egg-info/PKG-INFO
+Scripts.egg-info/SOURCES.txt
+Scripts.egg-info/dependency_links.txt
+Scripts.egg-info/top_level.txt
+tests/__init__.py
