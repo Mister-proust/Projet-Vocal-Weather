@@ -9,7 +9,7 @@ load_dotenv()
 
 
 ### Model NER ###
-def truc(model_name="Jean-Baptiste/camembert-ner-with-dates"):
+def app_model(model_name="Jean-Baptiste/camembert-ner-with-dates"):
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     model = AutoModelForTokenClassification.from_pretrained(model_name)
     ner_pipeline = pipeline("ner", model=model, tokenizer=tokenizer, aggregation_strategy="simple")
@@ -51,7 +51,7 @@ def main() :
 
     print(response.text)
 
-    ner_pipeline = truc() 
+    ner_pipeline = app_model() 
     resultats = extract_entities(ner_pipeline, response.text)
     LOC = extract_loc(resultats)
     print(LOC)

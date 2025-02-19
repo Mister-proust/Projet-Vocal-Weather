@@ -2,13 +2,16 @@ import os
 import azure.cognitiveservices.speech as speechsdk
 from dotenv import load_dotenv
 
-load_dotenv()
+def key() :
+    load_dotenv()
+    speech_key = os.getenv("SPEECH_KEY")
+    service_region = os.getenv("SPEECH_REGION")
+    return speech_key, service_region
 
-speech_key = os.getenv("SPEECH_KEY")
-service_region = os.getenv("SPEECH_REGION")
 
 def recognize_from_microphone():
     # This example requires environment variables named "SPEECH_KEY" and "SPEECH_REGION"
+    speech_key, service_region = key()
     speech_config = speechsdk.SpeechConfig(subscription=speech_key, region=service_region)
     speech_config.speech_recognition_language="fr-FR"
 
@@ -31,3 +34,8 @@ def recognize_from_microphone():
 
 recognize_from_microphone()
 
+def main() :
+    recognize_from_microphone()
+
+
+if __name__ == "__main__" : main()
