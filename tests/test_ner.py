@@ -23,7 +23,7 @@ def test_ner_loc() :
             Si des heures sont retrouvés dans le script, recupère les et mets les en format HH:00 car je ne souhaite pas de minutes"""
     ))
 
-    ner_pipeline = truc() 
+    ner_pipeline = app_model() 
     resultats = extract_entities(ner_pipeline, response.text)
     
     LOC = extract_loc(resultats)
