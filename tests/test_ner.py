@@ -1,4 +1,4 @@
-from Scripts.ner_transformers import truc, extract_entities, extract_loc, extract_date
+from Scripts.ner_transformers import app_model, extract_entities, extract_loc, extract_date
 import datetime
 import os
 from dotenv import load_dotenv
@@ -47,7 +47,7 @@ def test_ner_date() :
             Si des heures sont retrouvés dans le script, recupère les et mets les en format HH:00 car je ne souhaite pas de minutes"""
     ))
 
-    ner_pipeline = truc() 
+    ner_pipeline = app_model() 
     resultats = extract_entities(ner_pipeline, response.text)
     
     DATE = extract_date(resultats)

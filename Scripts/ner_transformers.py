@@ -4,6 +4,7 @@ import os
 from dotenv import load_dotenv
 from google import genai
 import datetime
+from Scripts.speech_recognition import recognize_from_microphone
 
 load_dotenv()
 
@@ -34,7 +35,8 @@ def main() :
     current_date=datetime.date.today()
 
 ### Texte à analyser ###
-    texte = "température lundi prochain à 12h35 à Tours "
+    texte = recognize_from_microphone()
+    print(f"Le texte à analyser est : {texte}")
 
 ### Gemini API ###
     gemini_key=os.getenv("API_KEY_GEMINI")
@@ -55,7 +57,8 @@ def main() :
     resultats = extract_entities(ner_pipeline, response.text)
     LOC = extract_loc(resultats)
     print(LOC)
-    DATE = extract_date(resultats)
+    DATE = str(extract_date(resultats))
     print(DATE)
+    return LOC, DATE, current_date
 
 if __name__ == "__main__" : main()

@@ -44,4 +44,5 @@ DB_NAME="database_name"
 SPEECH_KEY = "YourKey"
 SPEECH_REGION = "YourRegion"
 YOUR_API_KEY = "YourAPIWeatherKey"
+API_KEY_GEMINI = "YourGeminiKey"
 ```

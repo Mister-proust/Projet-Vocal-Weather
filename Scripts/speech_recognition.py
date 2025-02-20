@@ -13,9 +13,10 @@ def recognize_from_microphone():
     # This example requires environment variables named "SPEECH_KEY" and "SPEECH_REGION"
     speech_key, service_region = key()
     speech_config = speechsdk.SpeechConfig(subscription=speech_key, region=service_region)
+    
     speech_config.speech_recognition_language="fr-FR"
-
-    audio_config = speechsdk.audio.AudioConfig(use_default_microphone=True)
+    audio_config = speechsdk.AudioConfig(filename="../data/test.wav")
+    #audio_config = speechsdk.audio.AudioConfig(use_default_microphone=True)
     speech_recognizer = speechsdk.SpeechRecognizer(speech_config=speech_config, audio_config=audio_config)
 
     print("Que voulez vous savoir à propos de la météo ?")
@@ -23,6 +24,7 @@ def recognize_from_microphone():
 
     if speech_recognition_result.reason == speechsdk.ResultReason.RecognizedSpeech:
         print("Ce que vous avez demandé: {}".format(speech_recognition_result.text))
+        return speech_recognition_result.text
     elif speech_recognition_result.reason == speechsdk.ResultReason.NoMatch:
         print("Nous n'avons pas compris votre demande: {}".format(speech_recognition_result.no_match_details))
     elif speech_recognition_result.reason == speechsdk.ResultReason.Canceled:
@@ -32,9 +34,9 @@ def recognize_from_microphone():
             print("Error details: {}".format(cancellation_details.error_details))
             print("Did you set the speech resource key and region values?")
 
-recognize_from_microphone()
 
 def main() :
+    key()
     recognize_from_microphone()
 
 

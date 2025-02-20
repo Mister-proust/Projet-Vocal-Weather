@@ -10,3 +10,5 @@ protobuf
 sentencepiece
 dateparser
 google-genai
+Flask
+pytest
