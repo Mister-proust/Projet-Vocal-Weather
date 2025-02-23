@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ nom_app }} -</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/frontpicture.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="title-box">
+            <h1>{{ nom_app }}</h1>
+        </div>
+    </div>
+
+    <p>La p'tite appli M-M qui ensoleille votre vie !</p>
+
+
+        
+
+
+    <form action="/meteo" method="post">
+        <label for="ville">SI vous le souhaitez, vous pouvez entrer le texte à la main : </label><br>
+        <input type="text" id="ville" name="ville" placeholder="Entrez une ville"><br><br>
+        <button type="submit">Obtenir la météo</button>
+    </form>
+</body>
+</html>

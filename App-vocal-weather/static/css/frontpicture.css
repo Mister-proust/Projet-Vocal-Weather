@@ -1,0 +1,8 @@
+body {
+    background-image: url("/static/images/frontpicture.jpg");
+    background-size: cover;  /* Pour couvrir tout l'écran */
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 100vh; /* Prend toute la hauteur de l'écran */
+    margin: 0; /* Supprime les marges */
+}

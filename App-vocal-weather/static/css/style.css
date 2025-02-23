@@ -1,0 +1,22 @@
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start ; 
+    height: 100vh; /* Prend toute la hauteur de l'écran */
+    padding-top: 40px
+}
+
+.title-box {
+    background: rgba(255, 255, 255, 0.8); /* Fond semi-transparent blanc */
+    padding: 20px 40px;
+    border-radius: 15px; /* Coins arrondis */
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); /* Ombre pour donner du relief */
+    text-align: center;
+}
+
+.title-box h1 {
+    color: purple; /* Texte violet */
+    font-size: 3.5rem; /* Taille du texte */
+    font-family: Arial, sans-serif;
+    font-weight: bold;
+}

@@ -12,3 +12,7 @@ dateparser
 google-genai
 Flask
 pytest
+fastapi
+jinja2
+uvicorn
+fastapi[standard]
