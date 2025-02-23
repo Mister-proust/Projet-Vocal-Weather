@@ -4,7 +4,7 @@ import os
 from dotenv import load_dotenv
 from google import genai
 import datetime
-from Scripts.speech_recognition import recognize_from_microphone
+from speech_recognition import recognize_from_microphone
 
 load_dotenv()
 
@@ -46,9 +46,10 @@ def main() :
     response = client.models.generate_content(
         model="gemini-2.0-flash",
         contents=(
-            f"""Trouve la localisation et transcris en format la ou les dates en sachant qu'on est le : {current_date} 
+            f"""Trouve la seule localisation et transcris en format la ou les dates en séparant par une virgule en sachant qu'on est le : {current_date} 
             le format date doit être YYYY/MM/DD dans le script suivant sans ajouter un seul mot supplémentaire : {texte}
-            Si des heures sont retrouvés dans le script, recupère les et mets les en format HH:00 car je ne souhaite pas de minutes"""
+            Si des heures sont retrouvés dans le script, recupère les et mets les en format HH heures car je ne souhaite pas de minutes. 
+            Si aujourd'hui est indiqué alors mettre la date du jour actuel."""
     ))
 
     print(response.text)

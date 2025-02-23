@@ -1,6 +1,12 @@
 import os
 import azure.cognitiveservices.speech as speechsdk
 from dotenv import load_dotenv
+import os
+
+# Récupère le chemin du répertoire courant du script
+current_dir = os.path.dirname(__file__)
+audio_file = os.path.join(current_dir, "..", "data", "test.wav")
+
 
 def key() :
     load_dotenv()
@@ -15,8 +21,9 @@ def recognize_from_microphone():
     speech_config = speechsdk.SpeechConfig(subscription=speech_key, region=service_region)
     
     speech_config.speech_recognition_language="fr-FR"
-    audio_config = speechsdk.AudioConfig(filename="../data/test.wav")
-    #audio_config = speechsdk.audio.AudioConfig(use_default_microphone=True)
+    #audio_config = speechsdk.AudioConfig(filename="../data/test2.wav")
+    #audio_config = speechsdk.AudioConfig(filename=audio_file)
+    audio_config = speechsdk.audio.AudioConfig(use_default_microphone=True)
     speech_recognizer = speechsdk.SpeechRecognizer(speech_config=speech_config, audio_config=audio_config)
 
     print("Que voulez vous savoir à propos de la météo ?")
