@@ -12,18 +12,14 @@
         <div class="title-box">
             <h1>{{ nom_app }}</h1>
         </div>
+    <div class="subtitle-box">
+        <p>La p'tite appli M-M qui ensoleille votre vie !<p>
     </div>
-
-    <p>La p'tite appli M-M qui ensoleille votre vie !</p>
-
-
-        
-
-
-    <form action="/meteo" method="post">
-        <label for="ville">SI vous le souhaitez, vous pouvez entrer le texte à la main : </label><br>
-        <input type="text" id="ville" name="ville" placeholder="Entrez une ville"><br><br>
-        <button type="submit">Obtenir la météo</button>
-    </form>
+    <div class="microphone-container">
+        <button class="microphone-button">
+            <img src="{{ url_for('static', path='images/microbouton.png') }}" alt="Microphone">
+        </button>
+    </div>
+</div>
 </body>
 </html>

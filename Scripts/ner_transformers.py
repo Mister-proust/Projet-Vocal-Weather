@@ -4,7 +4,7 @@ import os
 from dotenv import load_dotenv
 from google import genai
 import datetime
-from speech_recognition import recognize_from_microphone
+
 
 load_dotenv()
 
