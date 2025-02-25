@@ -1,10 +1,21 @@
-from fastapi import FastAPI, Form, Request
+from fastapi import FastAPI, Form, Request, UploadFile, File
+from fastapi.responses import JSONResponse
+import os
+import subprocess
+from dotenv import load_dotenv
 from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles  # Ajout de cet import
+import os
 from fastapi.templating import Jinja2Templates
-from fastapi.staticfiles import StaticFiles
-from fastapi.middleware.cors import CORSMiddleware
+from pydub import AudioSegment
+from io import BytesIO
 
 app = FastAPI()
+
+UPLOAD_DIR = 'uploads'
+if not os.path.exists(UPLOAD_DIR):
+    os.makedirs(UPLOAD_DIR)
+
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
@@ -14,32 +25,21 @@ templates = Jinja2Templates(directory="templates")
 async def read_root(request: Request):
   return templates.TemplateResponse("index.html", {"request": request, "nom_app": "Micro-Météo"})
 
-
-@app.post("/meteo")
-async def process_form(request: Request, ville: str = Form(...), horizon: str = Form(...)):
-    # Récupérer les données du formulaire
-    form_data = await request.form()
-    ville = form_data.get("ville")
-    horizon = form_data.get("horizon")
-
-    # Ici, on traite les données (par exemple, appeler une API météo)
-    # Pour cet exemple, on va simplement renvoyer les données du formulaire
-    return {"ville": ville, "horizon": horizon}
-
-@app.post("/upload-audio")
+@app.post("/upload")
 async def upload_audio(file: UploadFile = File(...)):
     try:
-        # Créer un dossier pour enregistrer les fichiers si ce n'est pas déjà fait
-        upload_folder = "uploads"
-        os.makedirs(upload_folder, exist_ok=True)
+        # Sauvegarde du fichier .webm temporairement
+        webm_path = os.path.join(UPLOAD_DIR, file.filename)
+        with open(webm_path, "wb") as f:
+            f.write(await file.read())
 
-        # Créer un chemin pour le fichier à sauvegarder
-        file_location = os.path.join(upload_folder, file.filename)
+        # Conversion du fichier .webm en .wav avec pydub
+        audio = AudioSegment.from_file(webm_path, format="webm")
+        wav_path = os.path.join(UPLOAD_DIR, file.filename.replace(".webm", ".wav"))
+        audio.export(wav_path, format="wav")
 
-        # Sauvegarder le fichier
-        with open(file_location, "wb") as f:
-            shutil.copyfileobj(file.file, f)
-        
-        return {"message": f"Fichier {file.filename} reçu et sauvegardé avec succès.", "file_location": file_location}
+        # Retourne le chemin du fichier converti
+        return JSONResponse(content={"message": f"File successfully uploaded and converted to {wav_path}"}, status_code=200)
+
     except Exception as e:
-        return {"error": f"Erreur lors du téléchargement du fichier : {str(e)}"}
+        return JSONResponse(content={"message": f"Failed to upload and convert file: {str(e)}"}, status_code=500)

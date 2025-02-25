@@ -12,157 +12,73 @@
         <div class="title-box">
             <h1>{{ nom_app }}</h1>
         </div>
-    <div class="subtitle-box">
-        <p>La p'tite appli M-M qui ensoleille votre vie !<p>
+        <div class="subtitle-box">
+            <p>La p'tite appli M-M qui ensoleille votre vie !</p>
+        </div>
+        <div class="microphone-container">
+            <button id="microphoneButton" class="microphone-button">
+                <img src="{{ url_for('static', path='images/microbouton.png') }}" alt="Microphone">
+            </button>
+        </div>
+        <div id="status"></div>
     </div>
-    <div class="microphone-container">
-        <button class="microphone-button">
-            <img src="{{ url_for('static', path='images/microbouton.png') }}" alt="Microphone">
-        </button>
-    </div>
 
+    <script>
+        let mediaRecorder;
+        let audioChunks = [];
+        let microphoneButton = document.getElementById('microphoneButton');
+        let statusDiv = document.getElementById('status');
+        let audioPlayer = document.getElementById('audioPlayer');  // Élément de lecture audio
 
-<script>
-    let mediaRecorder;
-    let audioChunks = [];
-    let silenceTimer;
-    let audioContext;
-    let analyser;
-    let source;
-    let isRecording = false; // Variable pour vérifier si l'enregistrement est déjà en cours
-    let isSilenceDetected = false; // Variable pour savoir si le silence a été détecté
-    let noSoundDetectedTimer; // Timer pour détecter si aucun son n'a été capté
-    let errorMessage = document.getElementById('error-message'); // Message d'erreur sur la page
-
-    async function startRecording() {
-        // Si un enregistrement est déjà en cours, on ne lance pas un nouvel enregistrement
-        if (isRecording) {
-            console.log("🔴 Enregistrement déjà en cours, veuillez attendre qu'il se termine.");
-            return;
-        }
-
-        console.log("🔴 Début de l'enregistrement...");
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            mediaRecorder = new MediaRecorder(stream);
-            audioChunks = [];
-
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            analyser = audioContext.createAnalyser();
-            source = audioContext.createMediaStreamSource(stream);
-            source.connect(analyser);
-            analyser.fftSize = 512;
-
-            mediaRecorder.ondataavailable = event => {
-                console.log("🟡 Données audio disponibles...");
-                audioChunks.push(event.data);
-            };
-
-            mediaRecorder.onstop = async () => {
-                console.log("🛑 Enregistrement arrêté. Préparation de l'envoi...");
-                const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-
-                // Vérifions la taille du fichier
-                console.log("📏 Taille du fichier audio :", audioBlob.size);
-
-                if (audioBlob.size === 0) {
-                    console.error("❌ Le fichier audio est vide !");
-                    return;
-                }
-
-                const formData = new FormData();
-                formData.append("file", audioBlob, "recording.wav");
-
-                try {
-                    const response = await fetch("/upload-audio", {
-                        method: "POST",
+        // Fonction pour démarrer l'enregistrement audio
+        async function startRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                mediaRecorder.ondataavailable = event => audioChunks.push(event.data);
+                mediaRecorder.onstop = async () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    const formData = new FormData();
+                    formData.append('file', audioBlob, 'recording.wav');
+                    
+                    // Envoi du fichier au serveur
+                    const response = await fetch('/upload', {
+                        method: 'POST',
                         body: formData
                     });
-
+                    
                     if (response.ok) {
-                        console.log("✅ Fichier audio envoyé avec succès !");
+                        const result = await response.json();
+                        statusDiv.textContent = result.message;
                     } else {
-                        console.error("❌ Erreur lors de l'envoi de l'audio.");
+                        statusDiv.textContent = 'Erreur lors de l\'upload de l\'audio';
                     }
-                } catch (error) {
-                    console.error("🚨 Erreur lors de l'envoi :", error);
-                }
-            };
 
-            mediaRecorder.start();
-            isRecording = true;  // Marque l'enregistrement comme en cours
-            console.log("🎙️ Enregistrement en cours...");
-            checkSilence();
-        } catch (error) {
-            console.error("⚠️ Erreur lors de l'activation du micro :", error);
-        }
-    }
+                    
+                };
 
-    function checkSilence() {
-        const buffer = new Uint8Array(analyser.frequencyBinCount);
-
-        function detectSilence() {
-            analyser.getByteFrequencyData(buffer);
-            const volume = buffer.reduce((acc, val) => acc + val, 0) / buffer.length;
-
-            console.log("📊 Volume détecté :", volume);
-
-            if (volume < 10) { // Seuil de silence
-                if (!isSilenceDetected) {
-                    console.log("🔕 Silence détecté, arrêt dans 2 secondes...");
-                    silenceTimer = setTimeout(() => {
-                        mediaRecorder.stop();
-                        isRecording = false;  // L'enregistrement est terminé
-                        isSilenceDetected = true; // Silence déjà détecté, ne pas redémarrer l'enregistrement
-                        console.log("🛑 Enregistrement stoppé.");
-
-                        // Afficher un message d'erreur si l'enregistrement est vide
-                        if (audioChunks.length === 0) {
-                            showErrorMessage("Veuillez réessayer, nous n'avons pas compris votre message.");
-                        }
-                    }, 2000); // Arrête après 2 sec de silence
-                }
-            } else {
-                clearTimeout(silenceTimer);
-                silenceTimer = null;
-                isSilenceDetected = false; // Réinitialise la détection de silence si du bruit est détecté
-            }
-
-            if (mediaRecorder.state === "recording" && !isSilenceDetected) {
-                requestAnimationFrame(detectSilence);
+                // Démarrer l'enregistrement
+                mediaRecorder.start();
+                statusDiv.textContent = 'Enregistrement en cours...';
+                microphoneButton.disabled = true; // Désactiver le bouton pendant l'enregistrement
+                setTimeout(() => {
+                    mediaRecorder.stop(); // Arrêter l'enregistrement après 7.5 secondes
+                    microphoneButton.disabled = false; // Réactiver le bouton
+                }, 7500); // Limite d'enregistrement de 7.5 secondes
+            } catch (err) {
+                statusDiv.textContent = 'Erreur d\'accès au microphone : ' + err;
             }
         }
 
-        detectSilence();
-    }
-
-    function showErrorMessage(message) {
-        // Affiche le message d'erreur
-        if (errorMessage) {
-            errorMessage.textContent = message;
-            errorMessage.style.display = 'block'; // Affiche le message
-        } else {
-            console.log("❌ Le message d'erreur n'est pas défini dans le DOM.");
+        // Fonction pour arrêter l'enregistrement
+        function stopRecording() {
+            if (mediaRecorder && mediaRecorder.state === "recording") {
+                mediaRecorder.stop();
+            }
         }
-    }
 
-    document.addEventListener("DOMContentLoaded", function () {
-        const button = document.querySelector(".microphone-button");
-        if (button) {
-            button.addEventListener("click", startRecording);
-            console.log("✅ Bouton micro détecté.");
-        } else {
-            console.error("❌ Bouton micro introuvable !");
-        }
-    });
-</script>
-
-
-</div>
-<div id="error-message" style="display: none; color: red; font-size: 1.2em; text-align: center;">
-    <!-- Le message d'erreur sera inséré ici -->
-</div>
-
-
+        // Ajout d'un event listener pour le bouton
+        microphoneButton.addEventListener('click', startRecording);
+    </script>
 </body>
 </html>
