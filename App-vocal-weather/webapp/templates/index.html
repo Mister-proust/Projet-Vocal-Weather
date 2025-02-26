@@ -25,13 +25,14 @@
 
     <script>
         let mediaRecorder;
-        let audioChunks = [];
+        
         let microphoneButton = document.getElementById('microphoneButton');
         let statusDiv = document.getElementById('status');
         let audioPlayer = document.getElementById('audioPlayer');  // Élément de lecture audio
 
         // Fonction pour démarrer l'enregistrement audio
         async function startRecording() {
+            let audioChunks = [];
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 mediaRecorder = new MediaRecorder(stream);
@@ -53,8 +54,6 @@
                     } else {
                         statusDiv.textContent = 'Erreur lors de l\'upload de l\'audio';
                     }
-
-                    
                 };
 
                 // Démarrer l'enregistrement
