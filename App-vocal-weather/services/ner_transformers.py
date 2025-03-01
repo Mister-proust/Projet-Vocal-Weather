@@ -4,8 +4,8 @@ import os
 from dotenv import load_dotenv
 from google import genai
 import datetime
-from speech_recognition import recognize_from_microphone
-
+from services.speech_recognition import recognize_speech_from_file 
+import json
 
 load_dotenv()
 
@@ -31,12 +31,12 @@ def extract_date(resultats):
     DATE = [entite['word'] for entite in resultats if entite['entity_group'] == 'DATE']
     return DATE
 
-def main() : 
+async def main(wav_path) : 
     ### Date du jour ###
     current_date=datetime.date.today()
 
 ### Texte à analyser ###
-    texte = recognize_from_microphone()
+    texte = await recognize_speech_from_file(wav_path)
     print(f"Le texte à analyser est : {texte}")
 
 ### Gemini API ###
@@ -61,6 +61,16 @@ def main() :
     print(LOC)
     DATE = str(extract_date(resultats))
     print(DATE)
+    # Enregistrer les variables dans un fichier temporaire
+    temp_data = f"LOC={LOC}\nDATE={DATE}\ncurrent_date={current_date}\n"
+
+    UPLOAD_DIR = "./uploads/"
+    os.makedirs(UPLOAD_DIR, exist_ok=True)
+    temp_file_path = UPLOAD_DIR + "temp_data.txt"
+    with open(temp_file_path, "w") as temp_file:
+        temp_file.write(temp_data)
+
+
     return LOC, DATE, current_date
 
 if __name__ == "__main__" : main()

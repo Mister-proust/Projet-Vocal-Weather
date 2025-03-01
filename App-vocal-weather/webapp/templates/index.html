@@ -21,14 +21,24 @@
             </button>
         </div>
         <div id="status"></div>
+        <div id="recognizedText" style="display: none;">
+            <div class="reponse-box">
+            <p id="recognizedTextMessage"></p>
+        </div>
+        <!-- Nouveau bouton météo -->
+        <div id="weatherButtonContainer" style="display: none;">
+            <button id="weatherButton" class="weather-button">Cliquez pour voir votre météo</button>
+        </div>
     </div>
 
     <script>
         let mediaRecorder;
-        
         let microphoneButton = document.getElementById('microphoneButton');
         let statusDiv = document.getElementById('status');
-        let audioPlayer = document.getElementById('audioPlayer');  // Élément de lecture audio
+        let recognizedTextDiv = document.getElementById('recognizedText');
+        let recognizedTextMessage = document.getElementById('recognizedTextMessage');
+        let weatherButtonContainer = document.getElementById('weatherButtonContainer');
+        let weatherButton = document.getElementById('weatherButton');
 
         // Fonction pour démarrer l'enregistrement audio
         async function startRecording() {
@@ -51,6 +61,20 @@
                     if (response.ok) {
                         const result = await response.json();
                         statusDiv.textContent = result.message;
+                        recognizedTextMessage.textContent = result.text;
+                        recognizedTextDiv.style.display = 'block';
+                        
+                        // Réduire le bouton microphone
+                        microphoneButton.style.width = '6vw';
+                        microphoneButton.style.height = '6vw';
+                        microphoneButton.style.marginTop = '3vw';
+
+                        let microphoneImg = microphoneButton.querySelector('img');
+                        microphoneImg.style.width = '6vw';
+                        microphoneImg.style.height = '6vw';
+                        
+                        // Afficher le bouton météo
+                        weatherButtonContainer.style.display = 'block';
                     } else {
                         statusDiv.textContent = 'Erreur lors de l\'upload de l\'audio';
                     }
@@ -69,15 +93,14 @@
             }
         }
 
-        // Fonction pour arrêter l'enregistrement
-        function stopRecording() {
-            if (mediaRecorder && mediaRecorder.state === "recording") {
-                mediaRecorder.stop();
-            }
+        // Fonction pour afficher la météo (exemple, tu devras compléter l'API)
+        function showWeather() {
+            window.location.href = '/meteopage';  // Redirection vers la page météo
         }
 
         // Ajout d'un event listener pour le bouton
         microphoneButton.addEventListener('click', startRecording);
+        weatherButton.addEventListener('click', showWeather);
     </script>
 </body>
 </html>

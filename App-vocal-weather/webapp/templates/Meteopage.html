@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ nom_app }} - Météo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/frontpicture.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="title-box">
+            <h1>Micro-Météo</h1>
+        </div>
+        <div class="subtitle-box">
+            <p>Voici la météo demandée pour le {% for day in weather_results %}{{ day.date }} pour la ville de {{ day.LOC }} {% endfor %}:</p>
+        </div>
+        
+        <div class="weather-carousel">
+            {% for day in weather_results %}
+                <div class="hourly-forecast">
+                    {% for hour in day.hours %}
+                        <div class="hourly-item">
+                            <p>{{ hour.time }} : <img class="weather-icon" src="{{ hour.condition }}" alt="Condition météo"></p>
+                            <p>Température : {{ hour.temp_c }}°C</p>
+                            <p>Vent : {{ hour.wind_kph }} km/h</p>
+                            <p>Probabilité de pluie : {{ hour.chance_of_rain }}%</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+        </div>
+
+        <a href="/" class="back-button">Retour à l'accueil</a>
+    </div>
+
+    <style>
+        .weather-carousel {
+            display: flex;
+            overflow-x: auto;
+            padding: 10px 0;
+        }
+        .hourly-item {
+            flex: 0 0 auto;
+            margin-right: 15px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+    </style>
+</body>
+</html>

@@ -1,5 +1,5 @@
-from fastapi import FastAPI, Request, UploadFile, File
-from fastapi.responses import JSONResponse, HTMLResponse
+from fastapi import FastAPI, Request, UploadFile, File, Query
+from fastapi.responses import JSONResponse, HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 import os
 import subprocess
@@ -9,22 +9,19 @@ from io import BytesIO
 import azure.cognitiveservices.speech as speechsdk
 from dotenv import load_dotenv
 from time import time
+from services.speech_recognition import recognize_speech_from_file, key
+from services.conversion import upload_audio
+from services.ner_transformers import extract_loc, extract_date, main
+from services.Weather_api import get_weather_forecast
+from fastapi import FastAPI, Request, UploadFile, File
+
+key(env_path="../.env")
+
 app = FastAPI()
-
-
-UPLOAD_DIR = './uploads/'
-if not os.path.exists(UPLOAD_DIR):
-    os.makedirs(UPLOAD_DIR)
 
 app.mount("/static", StaticFiles(directory="./webapp/static"), name="static")
 
 templates = Jinja2Templates(directory="./webapp/templates")
-
-
-# 🔑 Chargement des variables d'environnement
-load_dotenv()
-SPEECH_KEY = os.getenv("SPEECH_KEY")
-SPEECH_REGION = os.getenv("SPEECH_REGION")
 
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
@@ -32,61 +29,19 @@ async def read_root(request: Request):
 
 
 @app.post("/upload")
-async def upload_audio(file: UploadFile = File()):
-    try:
-        # Lire le fichier en mémoire
-        file_content = await file.read()
-        # Vérifier si le fichier est bien reçu
-        if not file_content:
-            return JSONResponse(content={"message": "Fichier vide reçu"}, status_code=400)
+async def convert_text(file: UploadFile = File(...)):
+    wav_path = await upload_audio(file)
+    recognized_text = await recognize_speech_from_file(wav_path)
+    LOC, DATE, current_date = await main(wav_path)
+    weather_results = await get_weather_forecast(LOC, DATE)
 
-        print(f"Nom du fichier reçu : {file.filename}")  # Debug
+    # Retourner les résultats sous forme de JSON pour utilisation dans la page
+    return JSONResponse(content={"text": recognized_text}, status_code=200)
 
-        # Tentative de conversion avec pydub
-        try:
-            audio = AudioSegment.from_file(BytesIO(file_content), format="webm")
-        except Exception as e:
-            print(f"Erreur lors de la lecture du fichier : {str(e)}")
-            return JSONResponse(content={"message": f"Erreur lecture WebM : {str(e)}"}, status_code=500)
-        
-        # Exportation en WAV
-        with BytesIO() as wav_buffer:
-            try:
-                audio.export(wav_buffer, format="wav")
-            except Exception as e:
-                print(f"Erreur lors de la conversion en WAV : {str(e)}")
-                return JSONResponse(content={"message": f"Erreur conversion WAV : {str(e)}"}, status_code=500)
-            wav_path = UPLOAD_DIR + file.filename
-            # Sauvegarde du fichier
-            wav_buffer.seek(0)
-            with open(wav_path, "wb") as wav_file:
-                wav_file.write(wav_buffer.read())
-            wav_buffer.close()
-        recognized_text = recognize_speech_from_file(wav_path)
-        print(recognized_text)
-        
-        return JSONResponse(content={"message": "File converted and processed", "text": recognized_text}, status_code=200)
+@app.get("/meteopage", response_class=HTMLResponse)
+async def read_meteopage(request: Request, LOC: str = '', DATE: str = ''):
+    # Récupérer la météo si les paramètres sont fournis
+    weather_results = await get_weather_forecast(LOC, DATE)
+    return templates.TemplateResponse("meteopage.html", {"request": request, "weather_results": weather_results, "LOC": LOC, "DATE": DATE })
+    
 
-    except Exception as e:
-        print(f"Erreur générale : {str(e)}")  # Ajout du log
-        return JSONResponse(content={"message": f"Erreur lors de l'upload : {str(e)}"}, status_code=500)
-
-
-def recognize_speech_from_file(audio_file):
-    """Utilise Azure Speech API pour convertir l'audio en texte."""
-    try:
-        speech_config = speechsdk.SpeechConfig(subscription=SPEECH_KEY, region=SPEECH_REGION)
-        speech_config.speech_recognition_language = "fr-FR"
-        audio_config = speechsdk.AudioConfig(filename=audio_file)
-        speech_recognizer = speechsdk.SpeechRecognizer(speech_config=speech_config, audio_config=audio_config)
-
-        speech_recognition_result = speech_recognizer.recognize_once_async().get()
-
-        if speech_recognition_result.reason == speechsdk.ResultReason.RecognizedSpeech:
-            return speech_recognition_result.text
-        elif speech_recognition_result.reason == speechsdk.ResultReason.NoMatch:
-            return "Aucun texte reconnu."
-        elif speech_recognition_result.reason == speechsdk.ResultReason.Canceled:
-            return f"Reconnaissance annulée : {speech_recognition_result.cancellation_details.reason}"
-    except Exception as e:
-        return f"Erreur de reconnaissance vocale : {str(e)}"
