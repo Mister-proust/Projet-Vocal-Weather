@@ -18,3 +18,4 @@ fastapi[standard]
 pydub
 sqlalchemy
 sqlalchemy.orm
+psychopg2
