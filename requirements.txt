@@ -16,3 +16,5 @@ jinja2
 uvicorn
 fastapi[standard]
 pydub
+sqlalchemy
+sqlalchemy.orm

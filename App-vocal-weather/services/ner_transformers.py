@@ -71,6 +71,6 @@ async def main(wav_path) :
         temp_file.write(temp_data)
 
 
-    return LOC, DATE, current_date
+    return LOC, DATE, current_date, response.text
 
 if __name__ == "__main__" : main()
