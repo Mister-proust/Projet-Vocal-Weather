@@ -3,8 +3,8 @@ env
 data
 __pycache__
 *.pyc
-App-Vocal-Weather/uploads
-App-Vocal-Weather/__pycache__
-App-Vocal-Weather/*.pyc
+App-vocal-weather/uploads
+App-vocal-weather/__pycache__
+App-vocal-weather/*.pyc
 
 ```
