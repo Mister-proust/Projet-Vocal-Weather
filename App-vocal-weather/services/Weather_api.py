@@ -16,11 +16,9 @@ WEATHER_KEY = os.getenv("YOUR_API_KEY")
 
 # Chargement des variables LOC, DATE et current_date depuis le fichier texte
 def load_temp_data():
-    # Chemin vers le dossier uploads
     UPLOAD_DIR = "./uploads/"
     temp_file_path = os.path.join(UPLOAD_DIR, "temp_data.txt")
 
-    # Lire les données depuis le fichier temporaire
     with open(temp_file_path, "r") as temp_file:
         lines = temp_file.readlines()
 
@@ -58,9 +56,8 @@ def format_date(date):
 async def get_weather_forecast(LOC, DATE):
     LOC, DATE, current_date = load_temp_data()
     
-    # Si LOC est une liste, on prend le premier élément (ou on convertit en chaîne)
     if isinstance(LOC, list):
-        LOC = LOC[0]  # ou LOC = ",".join(LOC) si tu veux gérer plusieurs villes
+        LOC = LOC[0]  
         print(f"Localisation extraite : {LOC}")
 
     # Formatez la date
@@ -83,7 +80,6 @@ async def get_weather_forecast(LOC, DATE):
             print(f"⚠️ Aucune donnée de prévision reçue pour {LOC}.")
             return {"error": "Aucune donnée météo trouvée pour la localisation"}
 
-        # Pour chaque jour, extraire les données heure par heure
         meteo_resultats = []
         for day in forecast_days:
             if day["date"] == DATE:
