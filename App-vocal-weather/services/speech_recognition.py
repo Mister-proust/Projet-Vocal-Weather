@@ -3,17 +3,18 @@ import azure.cognitiveservices.speech as speechsdk
 from dotenv import load_dotenv
 import os
 
-# Récupère le chemin du répertoire courant du script
+
 current_dir = os.path.dirname(__file__)
 audio_file = os.path.join(current_dir, "..", "data", "recording.wav")
 
-
+# Fonction pour appelé les clés. 
 def key(env_path) :
     load_dotenv(env_path)
     speech_key = os.getenv("SPEECH_KEY")
     service_region = os.getenv("SPEECH_REGION")
     return speech_key, service_region
 
+# Fonction Azure Microsoft pour la reconnaissance vocale.
 async def recognize_speech_from_file(audio_file):
     speech_config = speechsdk.SpeechConfig(subscription=os.getenv("SPEECH_KEY"), region=os.getenv("SPEECH_REGION"))
     speech_config.speech_recognition_language = "fr-FR"

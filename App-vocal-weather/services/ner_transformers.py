@@ -17,7 +17,6 @@ def app_model(model_name="Jean-Baptiste/camembert-ner-with-dates"):
     ner_pipeline = pipeline("ner", model=model, tokenizer=tokenizer, aggregation_strategy="simple")
     return ner_pipeline
 
-# resultats = ner_pipeline(response.text)
 def extract_entities(ner_pipeline, response):
     resultats = ner_pipeline(response)
     return resultats
@@ -32,14 +31,12 @@ def extract_date(resultats):
     return DATE
 
 async def main(wav_path) : 
-    ### Date du jour ###
     current_date=datetime.date.today()
 
-### Texte à analyser ###
     texte = await recognize_speech_from_file(wav_path)
     print(f"Le texte à analyser est : {texte}")
 
-### Gemini API ###
+# Utilisation de gemini pour optimiser le rendu des localités et des dates.
     gemini_key=os.getenv("API_KEY_GEMINI")
 
     client = genai.Client(api_key=gemini_key)
@@ -55,13 +52,16 @@ async def main(wav_path) :
 
     print(response.text)
 
+    # Récupération dans des variables des localités et des dates. 
     ner_pipeline = app_model() 
     resultats = extract_entities(ner_pipeline, response.text)
     LOC = extract_loc(resultats)
     print(LOC)
     DATE = str(extract_date(resultats))
     print(DATE)
-    # Enregistrer les variables dans un fichier temporaire
+
+
+    # Enregistrement des variables dans un fichier temporaire.
     temp_data = f"LOC={LOC}\nDATE={DATE}\ncurrent_date={current_date}\n"
 
     UPLOAD_DIR = "./uploads/"

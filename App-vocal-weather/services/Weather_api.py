@@ -14,6 +14,7 @@ from datetime import datetime
 load_dotenv()
 WEATHER_KEY = os.getenv("YOUR_API_KEY")
 
+# Chargement des variables LOC, DATE et current_date depuis le fichier texte
 def load_temp_data():
     # Chemin vers le dossier uploads
     UPLOAD_DIR = "./uploads/"
@@ -35,7 +36,7 @@ def load_temp_data():
     return LOC, DATE, current_date
 
 
-
+# Conversion du format date selon le format souhaité
 def format_date(date):
     """Convertit une date en format 'YYYY-MM-DD'."""
     date_match = re.search(r"\d{4}/\d{2}/\d{2}", date)  # YYYY/MM/DD
@@ -52,6 +53,8 @@ def format_date(date):
         print(f"⚠️ Impossible de parser la date dans '{date}'.")
         return None
 
+
+# Fonction pour récupérer les prévisions météo
 async def get_weather_forecast(LOC, DATE):
     LOC, DATE, current_date = load_temp_data()
     

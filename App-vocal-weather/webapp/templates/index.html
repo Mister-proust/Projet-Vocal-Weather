@@ -25,7 +25,7 @@
             <div class="reponse-box">
             <p id="recognizedTextMessage"></p>
         </div>
-        <!-- Nouveau bouton météo -->
+
         <div id="weatherButtonContainer" style="display: none;">
             <button id="weatherButton" class="weather-button">Cliquez pour voir votre météo</button>
         </div>
@@ -52,7 +52,6 @@
                     const formData = new FormData();
                     formData.append('file', audioBlob, 'recording.wav');
                     
-                    // Envoi du fichier au serveur
                     const response = await fetch('/upload', {
                         method: 'POST',
                         body: formData
@@ -64,7 +63,6 @@
                         recognizedTextMessage.textContent = result.text;
                         recognizedTextDiv.style.display = 'block';
                         
-                        // Réduire le bouton microphone
                         microphoneButton.style.width = '6vw';
                         microphoneButton.style.height = '6vw';
                         microphoneButton.style.marginTop = '3vw';
@@ -73,7 +71,6 @@
                         microphoneImg.style.width = '6vw';
                         microphoneImg.style.height = '6vw';
                         
-                        // Afficher le bouton météo
                         weatherButtonContainer.style.display = 'block';
                     } else {
                         statusDiv.textContent = 'Erreur lors de l\'upload de l\'audio';
@@ -83,11 +80,11 @@
                 // Démarrer l'enregistrement
                 mediaRecorder.start();
                 statusDiv.textContent = 'Enregistrement en cours...';
-                microphoneButton.disabled = true; // Désactiver le bouton pendant l'enregistrement
+                microphoneButton.disabled = true; // 
                 setTimeout(() => {
-                    mediaRecorder.stop(); // Arrêter l'enregistrement après 7.5 secondes
-                    microphoneButton.disabled = false; // Réactiver le bouton
-                }, 7500); // Limite d'enregistrement de 7.5 secondes
+                    mediaRecorder.stop(); // 
+                    microphoneButton.disabled = false; 
+                },  5000); 
             } catch (err) {
                 statusDiv.textContent = 'Erreur d\'accès au microphone : ' + err;
             }
@@ -95,10 +92,9 @@
 
         // Fonction pour afficher la météo (exemple, tu devras compléter l'API)
         function showWeather() {
-            window.location.href = '/meteopage';  // Redirection vers la page météo
+            window.location.href = '/meteopage';  
         }
 
-        // Ajout d'un event listener pour le bouton
         microphoneButton.addEventListener('click', startRecording);
         weatherButton.addEventListener('click', showWeather);
     </script>
