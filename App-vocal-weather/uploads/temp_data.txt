@@ -1,3 +1,0 @@
-LOC=['Tours']
-DATE=['2025/03/04']
-current_date=2025-03-03
